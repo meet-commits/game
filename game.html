@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chase the Laddu Game</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: brown;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #gameContainer {
+            text-align: center;
+        }
+        #scoreBoard {
+            font-size: 24px;
+            margin-bottom: 500px;
+            margin-right: 1200px;
+            
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            transition: background-color 0.3s;
+        }
+        #startButton:hover {
+            background-color: #0056b3;
+        }
+        #laddu {
+            width: 50px;
+            height: 50px;
+            background: url('laddu.png') no-repeat center center;
+            background-size: contain;
+            position: absolute;
+            cursor: pointer;
+            display: none;
+        }
+        #man {
+            width: 100px;
+            height: 100px;
+            background: url('man.png') no-repeat center center;
+            background-size: contain;
+            position: absolute;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="gameContainer">
+    <div id="scoreBoard">Score: 0</div>
+    <button id="startButton">Start Game</button>
+    <div id="laddu"></div>
+    <div id="man"></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var score = 0;
+        var isGameActive = false;
+        var gameInterval;
+        var gameDuration = 30; // Game duration in seconds
+
+        function moveLaddu() {
+            var windowWidth = $(window).width() - 50; // Adjust for laddu size
+            var windowHeight = $(window).height() - 50; // Adjust for laddu size
+
+            var newLeft = Math.floor(Math.random() * windowWidth);
+            var newTop = Math.floor(Math.random() * windowHeight);
+
+            $("#laddu").css({left: newLeft, top: newTop}).fadeIn(200);
+        }
+
+        function moveManToLaddu() {
+            var ladduPosition = $("#laddu").position();
+            $("#man").animate({left: ladduPosition.left - 25, top: ladduPosition.top - 25}, 500, function() {
+                // Move laddu after the man reaches it
+                moveLaddu();
+            });
+        }
+
+        $("#startButton").click(function() {
+            if (isGameActive) return;
+
+            isGameActive = true;
+            score = 0;
+            $("#scoreBoard").text("Score: " + score);
+            $("#startButton").hide();
+
+            $("#laddu").show();
+            $("#man").show();
+            moveLaddu();
+            gameInterval = setInterval(moveLaddu, 2000);
+
+            setTimeout(function() {
+                clearInterval(gameInterval);
+                $("#laddu").hide();
+                $("#man").hide();
+                $("#startButton").show();
+
+                $("#startButton").text("Play Again").css("background-color", "#007bff");
+                alert("Game Over! Your score is: " + score);
+                isGameActive = false;
+            }, gameDuration * 1000); // Game duration
+        });
+
+        $("#laddu").click(function() {
+            if (!isGameActive) return;
+
+            score++;
+            $("#scoreBoard").text("Score: " + score);
+            moveManToLaddu();
+        });
+    });
+</script>
+
+</body>
+</html>
